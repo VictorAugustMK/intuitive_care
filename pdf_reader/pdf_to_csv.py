@@ -12,6 +12,7 @@ class PdfToCSV:
         try:
 
             self.config = self.load_config()
+
             self.zip_path = self.config["CSV"]["zip_path"]
             self.extract_folder = self.config["CSV"]["extract_folder"]
             self.out_csv = self.config["CSV"]["out_csv"]
