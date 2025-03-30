@@ -28,13 +28,15 @@ class Crawler:
             print("Finalizando")
 
         except Exception as e:
-            print(f"Ocorreu um erro: {e}")
+            print(f"An error occurred: {e}")
+            self.driver.quit()
 
         finally:
             print("Fechando tudo")
             self.driver.quit()
 
-    def load_config(self):
+    @staticmethod
+    def load_config():
         config = configparser.ConfigParser()
         config.read("C:\\repo\\intuitive_care\\.config")
         return config
@@ -52,10 +54,8 @@ class Crawler:
 
             cookie_button.click()
 
-
         except Exception as e:
-
-            print(f"Ocorreu um erro: {e}")
+            print(f"An error occurred: {e}")
             self.driver.quit()
 
     def start_download_annex_1(self):
