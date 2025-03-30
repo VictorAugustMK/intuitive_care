@@ -5,6 +5,7 @@ import zipfile
 import configparser
 import re
 
+from  web_scraper.utils.selenium_elements import *
 from web_scraper.utils.driverOptions import options as chrome_options
 from selenium import webdriver
 from selenium.webdriver.common.by import *
@@ -23,8 +24,8 @@ class Crawler:
         try:
 
             self.accessing_url()
-            self.start_download_annex_1()
-            self.start_download_annex_2()
+            self.start_download_annex_1(procedures_e)
+            self.start_download_annex_2(procedures_e)
             print("Finalizando")
 
         except Exception as e:
@@ -48,22 +49,19 @@ class Crawler:
             self.open_driver()
             self.driver.get(self.url)
             time.sleep(3)
-            cookie_button = self.driver.find_element(By.CSS_SELECTOR, "body > div.dsgov > div > div > div > div > "
-                                                                      "div.br-modal-footer.actions > button.br-button"
-                                                                      ".secondary.small.btn-accept")
-
+            cookie_button = self.driver.find_element(cokkies_button_e)
             cookie_button.click()
 
         except Exception as e:
             print(f"An error occurred: {e}")
             self.driver.quit()
 
-    def start_download_annex_1(self):
+    def start_download_annex_1(self, procedures_e):
 
         try:
 
-            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(By.CSS_SELECTOR, "#cfec435d-6921-461f-b85a-b425bc3cb4a5 > div > ol > li:nth-child(1) > a:nth-child(1)")))
-            download_annex = self.driver.find_element(By.CSS_SELECTOR, "#cfec435d-6921-461f-b85a-b425bc3cb4a5 > div > ol > li:nth-child(1) > a:nth-child(1)")
+            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(procedures_e)))
+            download_annex = self.driver.find_element(download_annex_e)
             download_annex.click()
 
             time.sleep(5)
@@ -75,13 +73,11 @@ class Crawler:
             print(f"An error occurred: {e}")
             self.driver.quit()
 
-    def start_download_annex_2(self):
+    def start_download_annex_2(self, procedures_e):
 
         try:
-            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(By.CSS_SELECTOR,
-                                                                                                    "#cfec435d-6921-461f-b85a-b425bc3cb4a5 > div > ol > li:nth-child(1) > a:nth-child(1)")))
-            download_annex = self.driver.find_element(By.CSS_SELECTOR,
-                                                        "#cfec435d-6921-461f-b85a-b425bc3cb4a5 > div > ol > li:nth-child(2) > a")
+            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(procedures_e)))
+            download_annex = self.driver.find_element(download_annex_e)
             download_annex.click()
 
             time.sleep(5)
