@@ -33,40 +33,48 @@ def get_db_connection():
 
 # Rota para buscar operadoras
 @app.route('/operadoras', methods=['GET'])
-@app.route('/operadoras', methods=['GET'])
 def search_operadoras():
-    search_term = request.args.get('search', '')  # Pega o parâmetro de busca
-    page = int(request.args.get('page', 1))  # Pega a página atual, default é 1
-    per_page = 15  # Número de resultados por página
-    offset = (page - 1) * per_page  # Cálculo do offset para a consulta SQL
+    search_term = request.args.to_dict()  # Pega todos os parâmetros da URL, incluindo filtros e paginação
+    page = int(request.args.get('page', 1))  # Obtém o número da página
+    limit = 15  # Número de resultados por página
+    offset = (page - 1) * limit  # Cálculo do offset
 
+    # Conectar ao banco
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Query para pegar os dados da tabela com LIMIT e OFFSET
-    query = f"""
-    SELECT razao_social AS "Razão Social",
-           nome_fantasia AS "Nome Fantasia",
-           registro_ans AS "Registro ANS",
-           cnpj AS "CNPJ",
-           representante AS "Representante"
-    FROM operator_plans.report_cadop
-    WHERE razao_social ILIKE %s OR nome_fantasia ILIKE %s
-    LIMIT %s OFFSET %s;
-    """
-    cursor.execute(query, ('%' + search_term + '%', '%' + search_term + '%', per_page, offset))
+    # Construir a consulta SQL com base nos filtros fornecidos
+    where_clauses = []
+    query_params = []
 
+    for key, value in search_term.items():
+        if key != "page" and key != "limit" and value:  # Exclui os parâmetros 'page' e 'limit' para o filtro
+            where_clauses.append(f"{key} ILIKE %s")
+            query_params.append(f"%{value}%")
+
+    where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
+    query = f"""
+    SELECT razao_social, nome_fantasia, registro_ans, cnpj, representante
+    FROM operator_plans.report_cadop
+    WHERE {where_sql}
+    LIMIT {limit} OFFSET {offset};
+    """
+
+    cursor.execute(query, query_params)
     operadoras = cursor.fetchall()
 
-    # Calcular o número total de páginas
-    cursor.execute(f"SELECT COUNT(*) FROM operator_plans.report_cadop WHERE razao_social ILIKE %s OR nome_fantasia ILIKE %s;", ('%' + search_term + '%', '%' + search_term + '%'))
-    total_results = cursor.fetchone()[0]
-    total_pages = (total_results // per_page) + (1 if total_results % per_page > 0 else 0)
+    # Obter o número total de resultados
+    count_query = f"""
+    SELECT COUNT(*) FROM operator_plans.report_cadop
+    WHERE {where_sql};
+    """
+    cursor.execute(count_query, query_params)
+    total_count = cursor.fetchone()[0]
+    total_pages = (total_count + limit - 1) // limit
 
     cursor.close()
     conn.close()
 
-    # Formatando os dados para enviar como JSON
     operadoras_list = []
     for operadora in operadoras:
         operadoras_list.append({
@@ -76,12 +84,8 @@ def search_operadoras():
             'cnpj': operadora[3],
             'representante': operadora[4]
         })
-
-    return jsonify({
-        'operadoras': operadoras_list,
-        'total_pages': total_pages
-    })
-
+    # Retorne o JSON com os resultados e a contagem total
+    return jsonify({'operadoras': operadoras_list, 'totalCount': total_count, 'totalPages': total_pages})
 
 if __name__ == '__main__':
     app.run(debug=True)

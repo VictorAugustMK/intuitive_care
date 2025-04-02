@@ -2,11 +2,20 @@
   <div class="operadoras">
     <h1>Lista de Operadoras</h1>
 
-    <!-- Campo de busca -->
-    <input v-model="searchTerm" type="text" placeholder="Buscar por operadora..." />
+    <!-- Campos de busca -->
+    <div class="search-fields">
+      <input v-model="searchTerm.razao_social" type="text" placeholder="Buscar por Razão Social" />
+      <input v-model="searchTerm.nome_fantasia" type="text" placeholder="Buscar por Nome Fantasia" />
+      <input v-model="searchTerm.registro_ans" type="text" placeholder="Buscar por Registro ANS" />
+      <input v-model="searchTerm.cnpj" type="text" placeholder="Buscar por CNPJ" />
+      <input v-model="searchTerm.representante" type="text" placeholder="Buscar por Representante" />
 
-    <!-- Botão de busca -->
-    <button @click="searchOperadoras">Buscar</button>
+      <!-- Botão de busca -->
+      <button @click="searchOperadoras">Buscar</button>
+
+      <!-- Botão de buscar todos -->
+      <button @click="searchAll">Buscar Todos</button>
+    </div>
 
     <!-- Tabela de Operadoras -->
     <table v-if="operadoras.length">
@@ -33,15 +42,11 @@
     <!-- Caso não haja resultados -->
     <p v-if="operadoras.length === 0">Nenhuma operadora encontrada.</p>
 
-    <!-- Controle de Paginação -->
-    <div v-if="totalPages > 1" class="pagination">
-      <button @click="changePage(1)" :disabled="page === 1">Primeira</button>
-      <button @click="changePage(page - 1)" :disabled="page === 1">Anterior</button>
-      
-      <span>Página {{ page }} de {{ totalPages }}</span>
-
-      <button @click="changePage(page + 1)" :disabled="page === totalPages">Próxima</button>
-      <button @click="changePage(totalPages)" :disabled="page === totalPages">Última</button>
+    <!-- Paginação -->
+    <div class="pagination">
+      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Anterior</button>
+      <span>{{ currentPage }}</span>
+      <button @click="changePage(currentPage + 1)" :disabled="currentPage * 15 >= totalItems">Próximo</button>
     </div>
   </div>
 </template>
@@ -50,43 +55,81 @@
 export default {
   data() {
     return {
-      searchTerm: "",  // Termo de busca
-      operadoras: [],  // Armazenará as operadoras encontradas
-      page: 1,         // Página atual
-      totalPages: 1    // Total de páginas (será atualizado após a consulta)
+      searchTerm: {
+        razao_social: "",
+        nome_fantasia: "",
+        registro_ans: "",
+        cnpj: "",
+        representante: "",
+      },
+      operadoras: [],
+      currentPage: 1,  // Página atual
+      totalItems: 0,   // Total de itens (para saber se existe próxima página)
     };
   },
   methods: {
-    // Método para realizar a busca das operadoras
+    // Método para realizar a busca das operadoras com base nos filtros
     async searchOperadoras() {
       try {
-        const response = await fetch(`http://localhost:5000/operadoras?search=${this.searchTerm}&page=${this.page}`);
+        const params = new URLSearchParams();
+        for (const key in this.searchTerm) {
+          if (this.searchTerm[key]) {
+            params.append(key, this.searchTerm[key]);
+          }
+        }
+        params.append("page", this.currentPage);
+        const response = await fetch(`http://localhost:5000/operadoras?${params.toString()}`);
         const data = await response.json();
-
-        this.operadoras = data.operadoras;  // Atualiza a lista de operadoras
-        this.totalPages = data.total_pages; // Atualiza o número total de páginas
+        
+        // A resposta agora inclui "operadoras" e "totalPages"
+        this.operadoras = data.operadoras;  // Atualiza a lista de operadoras com os dados recebidos
+        this.totalItems = data.totalCount;  // Atualiza o total de itens
       } catch (error) {
         console.error("Erro ao buscar operadoras:", error);
       }
+  },
+
+    // Método para buscar todas as operadoras (sem filtros) com paginação
+    async searchAll() {
+      try {
+        // Limpar os campos de busca
+        this.searchTerm = {
+          razao_social: "",
+          nome_fantasia: "",
+          registro_ans: "",
+          cnpj: "",
+          representante: "",
+        };
+        // Realizar a busca sem parâmetros de filtro
+        this.currentPage = 1;  // Resetar para a primeira página
+        const response = await fetch(`http://localhost:5000/operadoras?page=${this.currentPage}`);
+        const data = await response.json();
+        this.operadoras = data.items;
+        this.totalItems = data.totalItems;
+      } catch (error) {
+        console.error("Erro ao buscar todas as operadoras:", error);
+      }
     },
 
-    // Método para mudar de página
-    changePage(newPage) {
-      if (newPage > 0 && newPage <= this.totalPages) {
-        this.page = newPage;
-        this.searchOperadoras();  // Refazer a busca com a nova página
+    // Método para trocar de página
+    changePage(page) {
+      if (page >= 1 && page <= Math.ceil(this.totalItems / 15)) {
+        this.currentPage = page;
+        this.searchOperadoras();
       }
     }
   },
+
+  // Chama a função de busca sempre que a página for alterada
   watch: {
-    // Sempre que o termo de busca mudar, refazemos a busca desde a primeira página
-    searchTerm(newTerm) {
-      this.page = 1;
+    currentPage() {
       this.searchOperadoras();
     }
   },
+
+  // Chama a busca inicial quando o componente for montado
   mounted() {
-    this.searchOperadoras();  // Carregar os dados quando a página for carregada
+    this.searchOperadoras();
   }
 };
 </script>
