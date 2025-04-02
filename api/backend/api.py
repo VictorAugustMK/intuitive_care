@@ -131,14 +131,19 @@ def get_gastos_anuais():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        query = """
-        SELECT *
-        FROM financial_statements.mv_gastos_anuais
-        LIMIT 10;
-        """
-        cursor.execute(query)
-        resultados = cursor.fetchall()
+        ano = request.args.get('ano')
 
+        if ano:
+            query = """
+            SELECT * FROM financial_statements.mv_gastos_anuais
+            WHERE "ANO" = %s;
+            """
+            cursor.execute(query, (ano,))
+        else:
+            query = "SELECT * FROM financial_statements.mv_gastos_anuais LIMIT 10;"
+            cursor.execute(query)
+
+        resultados = cursor.fetchall()
         colunas = [desc[0] for desc in cursor.description]
         gastos_anuais = [dict(zip(colunas, linha)) for linha in resultados]
 
@@ -149,6 +154,20 @@ def get_gastos_anuais():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/anos_gastos_anual', methods=['GET'])
+def get_anos_disponiveis_anual():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = 'SELECT DISTINCT "ANO" FROM financial_statements.mv_gastos_anuais ORDER BY "ANO" DESC;'
+    cursor.execute(query)
+    anos = [row[0] for row in cursor.fetchall()]
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"anos": anos})
 
 @app.route('/gastos_trimestrais', methods=['GET'])
 def get_gastos_trimestrais():
@@ -215,7 +234,7 @@ def get_gastos_trimestrais():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/anos_gastos_trimestrais', methods=['GET'])
-def get_anos_disponiveis():
+def get_anos_disponiveis_trimestre():
     conn = get_db_connection()
     cursor = conn.cursor()
 

@@ -1,23 +1,28 @@
 <template>
-  <div class="operadoras">
+  <div>
     <h1>Lista de Operadoras</h1>
-
-    <!-- Campos de busca -->
-    <div class="search-fields">
-      <input v-model="searchTerm.razao_social" type="text" placeholder="Buscar por Razão Social" />
-      <input v-model="searchTerm.nome_fantasia" type="text" placeholder="Buscar por Nome Fantasia" />
-      <input v-model="searchTerm.registro_ans" type="text" placeholder="Buscar por Registro ANS" />
-      <input v-model="searchTerm.cnpj" type="text" placeholder="Buscar por CNPJ" />
-      <input v-model="searchTerm.representante" type="text" placeholder="Buscar por Representante" />
-
-      <!-- Botões de busca -->
-      <button @click="searchOperadoras">Buscar</button>
-      <button @click="searchAll">Buscar Todos</button>
-      <button @click="clearSearch">Limpar Busca</button>
+    <div>
+      <label for="razaoSocial">Razão Social:</label>
+      <input v-model="filtros.razao_social" id="razaoSocial" type="text" />
+      
+      <label for="nomeFantasia">Nome Fantasia:</label>
+      <input v-model="filtros.nome_fantasia" id="nomeFantasia" type="text" />
+      
+      <label for="registroAns">Registro ANS:</label>
+      <input v-model="filtros.registro_ans" id="registroAns" type="text" />
+      
+      <label for="cnpj">CNPJ:</label>
+      <input v-model="filtros.cnpj" id="cnpj" type="text" />
+      
+      <label for="representante">Representante:</label>
+      <input v-model="filtros.representante" id="representante" type="text" />
+      
+      <button @click="buscarOperadoras">Buscar</button>
+      <button @click="buscarTodasOperadoras">Buscar Todos</button>
+      <button @click="limparCampos">Limpar Campos</button>
     </div>
-
-    <!-- Tabela de Operadoras -->
-    <table v-if="operadoras.length">
+    
+    <table>
       <thead>
         <tr>
           <th>Razão Social</th>
@@ -37,88 +42,65 @@
         </tr>
       </tbody>
     </table>
-
-    <!-- Caso não haja resultados -->
-    <p v-if="operadoras.length === 0">Nenhuma operadora encontrada.</p>
-
-    <!-- Paginação -->
-    <div class="pagination">
-      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Anterior</button>
-      <span>{{ currentPage }}</span>
-      <button @click="changePage(currentPage + 1)" :disabled="currentPage * 15 >= totalItems">Próximo</button>
+    
+    <div>
+      <button @click="mudarPagina(pagina - 1)" :disabled="pagina <= 1">Anterior</button>
+      <span>Página {{ pagina }} de {{ totalPaginas }}</span>
+      <button @click="mudarPagina(pagina + 1)" :disabled="pagina >= totalPaginas">Próxima</button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 
 export default {
   data() {
     return {
-      searchTerm: {
-        razao_social: "",
-        nome_fantasia: "",
-        registro_ans: "",
-        cnpj: "",
-        representante: "",
-      },
       operadoras: [],
-      gastosAnuais: [],
-      currentPage: 1,
-      totalItems: 0,
+      filtros: {
+        razao_social: '',
+        nome_fantasia: '',
+        registro_ans: '',
+        cnpj: '',
+        representante: ''
+      },
+      pagina: 1,
+      totalPaginas: 1
     };
   },
   methods: {
-    // Busca as operadoras com filtros
-    async searchOperadoras() {
+    async buscarOperadoras() {
+      this.pagina = 1;
+      await this.carregarOperadoras();
+    },
+    async buscarTodasOperadoras() {
+      this.filtros = { razao_social: '', nome_fantasia: '', registro_ans: '', cnpj: '', representante: '' };
+      this.pagina = 1;
+      await this.carregarOperadoras();
+    },
+    limparCampos() {
+      this.filtros = { razao_social: '', nome_fantasia: '', registro_ans: '', cnpj: '', representante: '' };
+    },
+    async carregarOperadoras() {
       try {
-        const params = new URLSearchParams();
-        for (const key in this.searchTerm) {
-          if (this.searchTerm[key]) {
-            params.append(key, this.searchTerm[key]);
-          }
-        }
-        params.append("page", this.currentPage);
-        const response = await fetch(`http://localhost:5000/operadoras?${params.toString()}`);
-        const data = await response.json();
-        this.operadoras = data.operadoras;
-        this.totalItems = data.totalCount;
+        const params = { ...this.filtros, page: this.pagina };
+        const response = await axios.get('http://127.0.0.1:5000/operadoras', { params });
+        this.operadoras = response.data.operadoras;
+        this.totalPaginas = response.data.totalPages;
       } catch (error) {
-        console.error("Erro ao buscar operadoras:", error);
+        console.error('Erro ao buscar operadoras:', error);
       }
     },
-
-    // Busca todas as operadoras sem filtros
-    async searchAll() {
-      this.clearSearch();
-      this.searchOperadoras();
-    },
-
-    // Limpa os campos de busca e recarrega todas as operadoras
-    clearSearch() {
-      this.searchTerm = {
-        razao_social: "",
-        nome_fantasia: "",
-        registro_ans: "",
-        cnpj: "",
-        representante: "",
-      };
-      this.currentPage = 1;
-      this.searchOperadoras();
-    },
-
-    // Troca de página
-    changePage(page) {
-      if (page >= 1 && page <= Math.ceil(this.totalItems / 15)) {
-        this.currentPage = page;
-        this.searchOperadoras();
+    mudarPagina(novaPagina) {
+      if (novaPagina >= 1 && novaPagina <= this.totalPaginas) {
+        this.pagina = novaPagina;
+        this.carregarOperadoras();
       }
-    },
-
+    }
   },
-
-  mounted() {
-    this.searchOperadoras();
+  created() {
+    this.carregarOperadoras();
   }
 };
 </script>

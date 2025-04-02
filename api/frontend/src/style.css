@@ -81,13 +81,16 @@ button:focus-visible {
   }
 }
 
-.operadoras, .gastos-anuais {
+.operadoras {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   margin-top: 40px;
-  text-align: center;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
 }
 
 input {
@@ -95,6 +98,8 @@ input {
   font-size: 16px;
   margin-bottom: 20px;
   width: 300px;
+  border-radius: 10px; /* Adiciona bordas arredondadas */
+  border: 1px solid #ccc;
 }
 
 button {
@@ -115,6 +120,8 @@ table {
   width: 100%;
   margin-top: 30px;
   border-collapse: collapse;
+  border-radius: 10px; /* Arredonda a borda da tabela */
+  overflow: hidden; /* Garante que as bordas arredondadas funcionem */
 }
 
 th, td {
@@ -125,6 +132,25 @@ th, td {
 
 th {
   background-color: #646cff;
+  color: white;
+}
+
+/* Se precisar arredondar apenas os cantos superiores da tabela */
+table thead tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+
+table thead tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+/* Se precisar arredondar os cantos inferiores */
+table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
 }
 
 p {
@@ -133,7 +159,7 @@ p {
 }
 
 .pagination {
-  margin-top: 20px;
+  margin-bottom: 60px; /* Aumenta o espaço acima dos botões de paginação */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -159,33 +185,8 @@ span {
   margin-bottom: 10px;
   width: 300px;
   margin-right: 10px;
+  border-radius: 10px; /* Adiciona bordas arredondadas */
+  border: 1px solid #ccc;
 }
 
-.gastos-anuais {
-  margin-top: 40px;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
 
-.gastos-anuais h2 {
-  color: #ffffff;
-}
-
-.gastos-anuais table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.gastos-anuais th {
-  background-color: #535bf2;
-  color: white;
-  padding: 10px;
-}
-
-.gastos-anuais td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
-}
