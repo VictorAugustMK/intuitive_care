@@ -73,9 +73,9 @@ def search_operator():
     cursor.close()
     conn.close()
 
-    operadoras_list = []
+    operadortors_list = []
     for operadora in operadoras:
-        operadoras_list.append({
+        operadortors_list.append({
             'razao_social': operadora[0],
             'nome_fantasia': operadora[1],
             'registro_ans': operadora[2],
@@ -83,10 +83,10 @@ def search_operator():
             'representante': operadora[4]
         })
 
-    return jsonify({'operadoras': operadoras_list, 'totalCount': total_count, 'totalPages': total_pages})
+    return jsonify({'operadoras': operadortors_list, 'totalCount': total_count, 'totalPages': total_pages})
 
 
-@app.route('/setup-db', methods=['POST'])
+@app.route('/setup_db', methods=['POST'])
 def setup_db():
     querys_path = DATABASE['querys']
 
@@ -124,6 +124,109 @@ def download_files():
         return jsonify({"message": resultado})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/gastos_anuais', methods=['GET'])
+def get_gastos_anuais():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+        SELECT *
+        FROM financial_statements.mv_gastos_anuais
+        LIMIT 10;
+        """
+        cursor.execute(query)
+        resultados = cursor.fetchall()
+
+        colunas = [desc[0] for desc in cursor.description]
+        gastos_anuais = [dict(zip(colunas, linha)) for linha in resultados]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'gastos_anuais': gastos_anuais})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/gastos_trimestrais', methods=['GET'])
+def get_gastos_trimestrais():
+    try:
+        ano = request.args.get('ano')
+        page = int(request.args.get('page', 1))
+        limit = 15
+        offset = (page - 1) * limit
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        where_clauses = []
+        query_params = []
+
+        if ano:
+            where_clauses.append('"ANO" = %s')
+            query_params.append(ano)
+
+        where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
+
+        query = f"""
+            SELECT "EMPRESA", "NOME FANTASIA", "REGISTRO ANS", "DESCRIÇÃO", "ANO", "GASTOS TRIMESTRAL FINAL"
+            FROM financial_statements.mv_gastos_trimestrais
+            WHERE {where_sql}
+            LIMIT {limit} OFFSET {offset};
+        """
+
+        count_query = f"""
+            SELECT COUNT(*) FROM financial_statements.mv_gastos_trimestrais
+            WHERE {where_sql};
+        """
+
+        cursor.execute(query, query_params)
+        resultados = cursor.fetchall()
+
+        cursor.execute(count_query, query_params)
+        total_count = cursor.fetchone()[0]
+        total_pages = (total_count + limit - 1) // limit
+
+        gastos_trimestrais = [
+            {
+                "empresa": row[0],
+                "nome_fantasia": row[1],
+                "registro_ans": row[2],
+                "descricao": row[3],
+                "ano": row[4],
+                "gastos_trimestrais": row[5]
+            }
+            for row in resultados
+        ]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "gastos_trimestrais": gastos_trimestrais,
+            "totalCount": total_count,
+            "totalPages": total_pages
+        })
+
+    except Exception as e:
+        print(f"Erro ao buscar gastos trimestrais: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/anos_gastos_trimestrais', methods=['GET'])
+def get_anos_disponiveis():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = 'SELECT DISTINCT "ANO" FROM financial_statements.mv_gastos_trimestrais ORDER BY "ANO" DESC;'
+    cursor.execute(query)
+    anos = [row[0] for row in cursor.fetchall()]
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"anos": anos})
 
 if __name__ == '__main__':
     app.run(debug=True)
