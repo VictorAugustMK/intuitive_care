@@ -69,7 +69,7 @@ class Crawler:
         try:
 
             time.sleep(5)
-            download_annex = self.driver.find_element(*download_annex_e)
+            download_annex = self.driver.find_element(*download_annex_1)
             download_annex.click()
 
             time.sleep(5)
@@ -87,7 +87,7 @@ class Crawler:
         try:
 
             time.sleep(5)
-            download_annex = self.driver.find_element(*download_annex_e)
+            download_annex = self.driver.find_element(*download_annex_2)
             download_annex.click()
 
             time.sleep(5)
@@ -255,5 +255,6 @@ class Crawler:
 
         except Exception:
             print("Cookies have already been loaded")
+
 if __name__ == "__main__":
     crawler = Crawler()
