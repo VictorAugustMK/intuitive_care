@@ -1,10 +1,11 @@
 import glob
 import os
+import psycopg2
+import configparser
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import psycopg2
-import configparser
+from web_scraper import main
 
 app = Flask(__name__)
 CORS(app)
@@ -20,6 +21,7 @@ DATABASE = config['DATABASE']
 DATABASE_URI = f"postgresql://{DATABASE['user']}:{DATABASE['password']}@{DATABASE['host']}:{DATABASE['port']}/{DATABASE['database']}"
 print("Configuração carregada com sucesso!")
 
+
 def get_db_connection():
     conn = psycopg2.connect(
         host=DATABASE['host'],
@@ -29,6 +31,7 @@ def get_db_connection():
         port=DATABASE['port']
     )
     return conn
+
 
 @app.route('/operadoras', methods=['GET'])
 def search_operator():
@@ -114,6 +117,13 @@ def setup_db():
         print(f"Erro ao configurar o banco de dados: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/download_files', methods=['POST'])
+def download_files():
+    try:
+        resultado = main.crawler()
+        return jsonify({"message": resultado})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
