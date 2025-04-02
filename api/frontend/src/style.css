@@ -81,7 +81,87 @@ button:focus-visible {
   }
 }
 
-.operadoras {
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  width: 300px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+
+button:hover {
+  background-color: #45a049;
+}
+
+table {
+  width: 100%;
+  margin-top: 30px;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #646cff;
+  color: white;
+}
+
+table thead tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+
+table thead tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+
+table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+p {
+  margin-top: 20px;
+  color: #888; 
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+button {
+  margin: 15px;
+}
+
+span {
+  margin: 0 15px;
+  font-size: 18px;
+}
+
+.search-fields input {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  width: 300px;
+  margin-right: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.view-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -91,15 +171,6 @@ button:focus-visible {
   padding: 20px;
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-}
-
-input {
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  width: 300px;
-  border-radius: 10px; /* Adiciona bordas arredondadas */
-  border: 1px solid #ccc;
 }
 
 button {
@@ -118,10 +189,8 @@ button:hover {
 
 table {
   width: 100%;
-  margin-top: 30px;
+  margin-top: 20px;
   border-collapse: collapse;
-  border-radius: 10px; /* Arredonda a borda da tabela */
-  overflow: hidden; /* Garante que as bordas arredondadas funcionem */
 }
 
 th, td {
@@ -131,62 +200,15 @@ th, td {
 }
 
 th {
-  background-color: #646cff;
+  background-color: #535bf2;
   color: white;
 }
 
-/* Se precisar arredondar apenas os cantos superiores da tabela */
-table thead tr:first-child th:first-child {
-  border-top-left-radius: 10px;
-}
-
-table thead tr:first-child th:last-child {
-  border-top-right-radius: 10px;
-}
-
-/* Se precisar arredondar os cantos inferiores */
-table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
-}
-
-p {
-  margin-top: 20px;
-  color: #888; 
-}
-
 .pagination {
-  margin-bottom: 60px; /* Aumenta o espaço acima dos botões de paginação */
+  margin-top: 20px;
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-button {
-  margin: 0 5px;
-}
-
-span {
-  margin: 0 15px;
-  font-size: 18px;
-}
-
-.search-fields input {
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  width: 300px;
-  margin-right: 10px;
-  border-radius: 10px; /* Adiciona bordas arredondadas */
-  border: 1px solid #ccc;
+  gap: 10px;
 }
 
 

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="operadora">
     <h1>Lista de Operadoras</h1>
     <div>
       <label for="razaoSocial">Razão Social:</label>
@@ -20,6 +20,7 @@
       <button @click="buscarOperadoras">Buscar</button>
       <button @click="buscarTodasOperadoras">Buscar Todos</button>
       <button @click="limparCampos">Limpar Campos</button>
+      
     </div>
     
     <table>
@@ -106,5 +107,62 @@ export default {
 </script>
 
 <style>
-@import '../style.css'; /* Importando o CSS externo */
+
+.operadora {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 40px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.search-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #535bf2;
+  color: white;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 </style>
