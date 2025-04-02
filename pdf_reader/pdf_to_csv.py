@@ -133,5 +133,6 @@ class PdfToCSV:
         except Exception as e:
             print(f"An error occurred: {e}")
 
-pdf_to_csv = PdfToCSV()
+if __name__ == "__main__":
+    pdf_to_csv = PdfToCSV()
 

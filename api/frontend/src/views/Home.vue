@@ -37,7 +37,7 @@ export default {
 
     async setupDatabase() {
       try {
-        const response = await axios.post('http://localhost:5000/setup-db');
+        const response = await axios.post('http://localhost:5000/setup_db');
         this.message = response.data.message;
       } catch (error) {
         this.message = error.response?.data?.error || 'Erro ao configurar o banco de dados';
