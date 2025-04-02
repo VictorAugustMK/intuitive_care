@@ -31,8 +31,8 @@ class Crawler:
             self.accessing_url()
             self.start_download_annex_1()
             self.start_download_annex_2()
-            # self.accounting_year_1()
-            # self.accounting_year_2()
+            self.accounting_year_1()
+            self.accounting_year_2()
             print("Finalizando")
 
         except Exception as e:
