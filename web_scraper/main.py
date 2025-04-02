@@ -20,19 +20,23 @@ class Crawler:
         self.url = self.config["SELENIUM"]["url"]
         self.download_dir = self.config["SELENIUM"]["download_dir"]
         self.accounting_folder = self.config["SELENIUM"]["accounting_folder"]
+        self.operator_plans_folder = self.config["SELENIUM"]["operator_plans_folder"]
         self.accounting_url = self.config["SELENIUM"]["accounting_url"]
+        self.operator_plan_url = self.config["SELENIUM"]["operator_plan_url"]
         self.cookies_folder = self.config["SELENIUM"]["cookies_folder"]
         self.extension_zip = self.config["EXTENSION"]["zip"]
         self.extension_pdf = self.config["EXTENSION"]["pdf"]
+        self.extension_csv = self.config["EXTENSION"]["csv"]
 
         try:
 
             self.open_driver()
-            self.accessing_url()
-            self.start_download_annex_1()
-            self.start_download_annex_2()
-            self.accounting_year_1()
-            self.accounting_year_2()
+            # self.accessing_url()
+            # self.start_download_annex_1()
+            # self.start_download_annex_2()
+            # self.accounting_year_1()
+            # self.accounting_year_2()
+            self.operator_plans_download()
             print("Finishing")
 
         except Exception as e:
@@ -137,6 +141,8 @@ class Crawler:
             hrefs = [link.get_attribute("href") for link in links if link.get_attribute("href").endswith(extension_zip)]
 
             for url in hrefs:
+
+                time.sleep(3)
                 file_downloaded = os.path.join(accounting_folder, os.path.basename(url))
 
                 year_match = re.search(r"\d{4}", file_downloaded)
@@ -156,6 +162,7 @@ class Crawler:
                     for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
 
+                time.sleep(3)
                 self.extract_zip(file_path, folder_path)
 
         except Exception as e:
@@ -173,7 +180,7 @@ class Crawler:
             self.create_folder_dir(accounting_folder)
 
             self.driver.get(self.accounting_url)
-            accounting_files = self.driver.find_element(*accounting_files_e)
+            accounting_files = self.driver.find_element(*accounting_files_2_e)
 
             accounting_url = accounting_files.get_attribute("href")
             self.driver.get(accounting_url)
@@ -183,6 +190,7 @@ class Crawler:
 
             hrefs = [link.get_attribute("href") for link in links if link.get_attribute("href").endswith(extension_zip)]
 
+            time.sleep(3)
             for url in hrefs:
                 file_downloaded = os.path.join(accounting_folder, os.path.basename(url))
 
@@ -203,7 +211,44 @@ class Crawler:
                     for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
 
+                time.sleep(3)
                 self.extract_zip(file_path, folder_path)
+
+        except Exception as e:
+
+            print(f"An error occurred: {e}")
+            self.driver.quit()
+
+    def operator_plans_download(self):
+
+        try:
+
+            extension_csv = self.extension_csv
+
+            operator_plan_folder = self.operator_plans_folder
+            self.create_folder_dir(operator_plan_folder)
+
+            self.driver.get(self.operator_plan_url)
+
+            table_href = self.driver.find_element(*table_href_e)
+            links = table_href.find_elements(*links_e)
+
+            hrefs = [link.get_attribute("href") for link in links if link.get_attribute("href").endswith(extension_csv)]
+
+            time.sleep(3)
+            for url in hrefs:
+
+                folder_path = operator_plan_folder
+                os.makedirs(folder_path, exist_ok=True)
+
+                file_path = os.path.join(folder_path, os.path.basename(url))
+
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+
+                with open(file_path, "wb") as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
 
         except Exception as e:
 
