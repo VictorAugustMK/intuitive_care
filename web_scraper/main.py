@@ -18,6 +18,8 @@ class Crawler:
         self.config = self.load_config()
         self.url = self.config["SELENIUM"]["url"]
         self.download_dir = self.config["SELENIUM"]["download_dir"]
+        self.accounting_folder = self.config["SELENIUM"]["accounting_folder"]
+        self.accounting_url = self.config["SELENIUM"]["accounting_url"]
         self.cookies_folder = self.config["SELENIUM"]["cookies_folder"]
         self.extension_zip = self.config["EXTENSION"]["zip"]
 
@@ -25,8 +27,10 @@ class Crawler:
 
             self.open_driver()
             self.accessing_url()
-            self.start_download_annex_1()
-            self.start_download_annex_2()
+            # self.start_download_annex_1()
+            # self.start_download_annex_2()
+            self.accounting_year_1()
+            self.accounting_year_2()
             print("Finalizando")
 
         except Exception as e:
@@ -95,6 +99,100 @@ class Crawler:
             self.switch_window()
             self.request_pdf()
             self.close_window()
+
+        except Exception as e:
+
+            print(f"An error occurred: {e}")
+            self.driver.quit()
+
+    def accounting_year_1(self):
+
+        try:
+
+            extension_zip = self.extension_zip
+
+            accounting_folder = self.accounting_folder
+            self.create_folder_dir(accounting_folder)
+
+            self.driver.get(self.accounting_url)
+            accounting_files = self.driver.find_element(*accounting_files_e)
+
+            accounting_url = accounting_files.get_attribute("href")
+            self.driver.get(accounting_url)
+
+            table_href = self.driver.find_element(*table_href_e)
+            links = table_href.find_elements(*links_e)
+
+            hrefs = [link.get_attribute("href") for link in links if link.get_attribute("href").endswith(extension_zip)]
+
+            for url in hrefs:
+                file_downloaded = os.path.join(accounting_folder, os.path.basename(url))
+
+                year_match = re.search(r"\d{4}", file_downloaded)
+                if year_match:
+                    final_folder = year_match.group()
+                else:
+                    continue
+
+                folder_path = os.path.join(accounting_folder, final_folder)
+                os.makedirs(folder_path, exist_ok=True)
+
+                file_path = os.path.join(folder_path, os.path.basename(url))
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+
+                with open(file_path, "wb") as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
+
+                self.extract_zip(file_path, folder_path)
+
+        except Exception as e:
+
+            print(f"An error occurred: {e}")
+            self.driver.quit()
+
+    def accounting_year_2(self):
+
+        try:
+
+            extension_zip = self.extension_zip
+
+            accounting_folder = self.accounting_folder
+            self.create_folder_dir(accounting_folder)
+
+            self.driver.get(self.accounting_url)
+            accounting_files = self.driver.find_element(*accounting_files_e)
+
+            accounting_url = accounting_files.get_attribute("href")
+            self.driver.get(accounting_url)
+
+            table_href = self.driver.find_element(*table_href_e)
+            links = table_href.find_elements(*links_e)
+
+            hrefs = [link.get_attribute("href") for link in links if link.get_attribute("href").endswith(extension_zip)]
+
+            for url in hrefs:
+                file_downloaded = os.path.join(accounting_folder, os.path.basename(url))
+
+                year_match = re.search(r"\d{4}", file_downloaded)
+                if year_match:
+                    final_folder = year_match.group()
+                else:
+                    continue
+
+                folder_path = os.path.join(accounting_folder, final_folder)
+                os.makedirs(folder_path, exist_ok=True)
+
+                file_path = os.path.join(folder_path, os.path.basename(url))
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+
+                with open(file_path, "wb") as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
+
+                self.extract_zip(file_path, folder_path)
 
         except Exception as e:
 
@@ -172,7 +270,7 @@ class Crawler:
 
             download_dir = self.download_dir
             extension_zip = self.extension_zip
-            self.create_download_dir()
+            self.create_folder_dir(download_dir)
 
             url = self.driver.current_url
             response = requests.get(url)
@@ -209,11 +307,11 @@ class Crawler:
             print(f"An error occurred: {e}")
             self.driver.quit()
 
-    def create_download_dir(self):
+    def create_folder_dir(self,download_folder):
 
         try:
 
-            download_dir =  self.download_dir
+            download_dir =  download_folder
             os.makedirs(download_dir, exist_ok=True)
 
         except Exception as e:
@@ -255,6 +353,26 @@ class Crawler:
 
         except Exception:
             print("Cookies have already been loaded")
+
+    def extract_zip(self,zip_file, extract_to):
+
+        if not os.path.exists(zip_file):
+            raise FileNotFoundError(f"Arquivo ZIP não encontrado: {zip_file}")
+
+        os.makedirs(extract_to, exist_ok=True)
+
+        with zipfile.ZipFile(zip_file, "r") as zip_ref:
+            zip_ref.extractall(extract_to)
+
+        for file_name in os.listdir(extract_to):
+            old_path = os.path.join(extract_to, file_name)
+
+            if os.path.isfile(old_path):
+                file_base, file_ext = os.path.splitext(file_name)
+                new_name = file_base.upper() + file_ext
+                new_path = os.path.join(extract_to, new_name)
+
+                os.rename(old_path, new_path)
 
 if __name__ == "__main__":
     crawler = Crawler()
