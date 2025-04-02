@@ -5,6 +5,8 @@
     <button @click="goToOperadoras">Ir para Operadoras</button>
     <p>Clique no botão abaixo para configurar o banco de dados:</p>
     <button @click="setupDatabase">Configurar Banco de Dados</button>
+    <p>Clique no botão abaixo para executar o Web Scraper:</p>
+    <button @click="runWebScraper">Executar Web Scraper</button>
     <p v-if="message">{{ message }}</p>
   </div>
 </template>
@@ -31,6 +33,15 @@ export default {
         this.message = response.data.message;
       } catch (error) {
         this.message = error.response?.data?.error || 'Erro ao configurar o banco de dados';
+      }
+    },
+    // Método para executar o Web Scraper
+    async runWebScraper() {
+      try {
+        const response = await axios.post('http://localhost:5000/download_files');
+        this.message = response.data.message;
+      } catch (error) {
+        this.message = error.response?.data?.error || 'Erro ao executar o Web Scraper';
       }
     }
   }

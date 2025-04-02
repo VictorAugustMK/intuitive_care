@@ -256,4 +256,5 @@ class Crawler:
         except Exception:
             print("Cookies have already been loaded")
 
-crawler = Crawler()
+if __name__ == "__main__":
+    crawler = Crawler()

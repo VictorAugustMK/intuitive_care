@@ -5,7 +5,7 @@ import configparser
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from web_scraper import main
+from web_scraper.main import Crawler
 
 app = Flask(__name__)
 CORS(app)
@@ -120,7 +120,7 @@ def setup_db():
 @app.route('/download_files', methods=['POST'])
 def download_files():
     try:
-        resultado = main.crawler()
+        resultado = Crawler()
         return jsonify({"message": resultado})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
