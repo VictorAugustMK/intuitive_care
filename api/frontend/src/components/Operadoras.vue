@@ -10,11 +10,10 @@
       <input v-model="searchTerm.cnpj" type="text" placeholder="Buscar por CNPJ" />
       <input v-model="searchTerm.representante" type="text" placeholder="Buscar por Representante" />
 
-      <!-- Botão de busca -->
+      <!-- Botões de busca -->
       <button @click="searchOperadoras">Buscar</button>
-
-      <!-- Botão de buscar todos -->
       <button @click="searchAll">Buscar Todos</button>
+      <button @click="clearSearch">Limpar Busca</button> <!-- Novo botão -->
     </div>
 
     <!-- Tabela de Operadoras -->
@@ -63,12 +62,12 @@ export default {
         representante: "",
       },
       operadoras: [],
-      currentPage: 1,  // Página atual
-      totalItems: 0,   // Total de itens (para saber se existe próxima página)
+      currentPage: 1,
+      totalItems: 0,
     };
   },
   methods: {
-    // Método para realizar a busca das operadoras com base nos filtros
+    // Busca as operadoras com filtros
     async searchOperadoras() {
       try {
         const params = new URLSearchParams();
@@ -80,38 +79,33 @@ export default {
         params.append("page", this.currentPage);
         const response = await fetch(`http://localhost:5000/operadoras?${params.toString()}`);
         const data = await response.json();
-        
-        // A resposta agora inclui "operadoras" e "totalPages"
-        this.operadoras = data.operadoras;  // Atualiza a lista de operadoras com os dados recebidos
-        this.totalItems = data.totalCount;  // Atualiza o total de itens
+        this.operadoras = data.operadoras;
+        this.totalItems = data.totalCount;
       } catch (error) {
         console.error("Erro ao buscar operadoras:", error);
       }
-  },
-
-    // Método para buscar todas as operadoras (sem filtros) com paginação
-    async searchAll() {
-      try {
-        // Limpar os campos de busca
-        this.searchTerm = {
-          razao_social: "",
-          nome_fantasia: "",
-          registro_ans: "",
-          cnpj: "",
-          representante: "",
-        };
-        // Realizar a busca sem parâmetros de filtro
-        this.currentPage = 1;  // Resetar para a primeira página
-        const response = await fetch(`http://localhost:5000/operadoras?page=${this.currentPage}`);
-        const data = await response.json();
-        this.operadoras = data.items;
-        this.totalItems = data.totalItems;
-      } catch (error) {
-        console.error("Erro ao buscar todas as operadoras:", error);
-      }
     },
 
-    // Método para trocar de página
+    // Busca todas as operadoras sem filtros
+    async searchAll() {
+      this.clearSearch(); // Reseta os filtros antes de buscar todas
+      this.searchOperadoras();
+    },
+
+    // Limpa os campos de busca e recarrega todas as operadoras
+    clearSearch() {
+      this.searchTerm = {
+        razao_social: "",
+        nome_fantasia: "",
+        registro_ans: "",
+        cnpj: "",
+        representante: "",
+      };
+      this.currentPage = 1;
+      this.searchOperadoras();
+    },
+
+    // Troca de página
     changePage(page) {
       if (page >= 1 && page <= Math.ceil(this.totalItems / 15)) {
         this.currentPage = page;
@@ -120,14 +114,6 @@ export default {
     }
   },
 
-  // Chama a função de busca sempre que a página for alterada
-  watch: {
-    currentPage() {
-      this.searchOperadoras();
-    }
-  },
-
-  // Chama a busca inicial quando o componente for montado
   mounted() {
     this.searchOperadoras();
   }
@@ -135,5 +121,5 @@ export default {
 </script>
 
 <style>
-@import '../style.css';  /* Importando o CSS externo */
+@import '../style.css'; /* Importando o CSS externo */
 </style>
