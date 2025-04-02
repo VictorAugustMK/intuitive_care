@@ -31,11 +31,11 @@ class Crawler:
         try:
 
             self.open_driver()
-            # self.accessing_url()
-            # self.start_download_annex_1()
-            # self.start_download_annex_2()
-            # self.accounting_year_1()
-            # self.accounting_year_2()
+            self.accessing_url()
+            self.start_download_annex_1()
+            self.start_download_annex_2()
+            self.accounting_year_1()
+            self.accounting_year_2()
             self.operator_plans_download()
             print("Finishing")
 
