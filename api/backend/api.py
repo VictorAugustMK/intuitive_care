@@ -73,9 +73,9 @@ def search_operator():
     cursor.close()
     conn.close()
 
-    operadoras_list = []
+    operadortors_list = []
     for operadora in operadoras:
-        operadoras_list.append({
+        operadortors_list.append({
             'razao_social': operadora[0],
             'nome_fantasia': operadora[1],
             'registro_ans': operadora[2],
@@ -83,7 +83,7 @@ def search_operator():
             'representante': operadora[4]
         })
 
-    return jsonify({'operadoras': operadoras_list, 'totalCount': total_count, 'totalPages': total_pages})
+    return jsonify({'operadoras': operadortors_list, 'totalCount': total_count, 'totalPages': total_pages})
 
 
 @app.route('/setup-db', methods=['POST'])

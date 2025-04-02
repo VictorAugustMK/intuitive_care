@@ -6,7 +6,7 @@
     <p>Clique no botão abaixo para configurar o banco de dados:</p>
     <button @click="setupDatabase">Configurar Banco de Dados</button>
     <p>Clique no botão abaixo para executar o Web Scraper:</p>
-    <button @click="runWebScraper">Executar Web Scraper</button>
+    <button @click="runCrawler">Executar Crawler</button>
     <p v-if="message">{{ message }}</p>
   </div>
 </template>
@@ -36,7 +36,7 @@ export default {
       }
     },
     // Método para executar o Web Scraper
-    async runWebScraper() {
+    async runCrawler() {
       try {
         const response = await axios.post('http://localhost:5000/download_files');
         this.message = response.data.message;
