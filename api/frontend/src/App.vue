@@ -4,9 +4,9 @@
     <nav>
       <router-link to="/">Home</router-link> |
       <router-link to="/sobre">Sobre</router-link> |
-      <router-link to="/operadoras">Operadoras</router-link> <!-- Link para a página de operadoras -->
+      <router-link to="/operadoras">Operadoras</router-link>
     </nav>
-    <router-view></router-view>  <!-- Aqui as rotas serão renderizadas -->
+    <router-view></router-view>
   </div>
 </template>
 

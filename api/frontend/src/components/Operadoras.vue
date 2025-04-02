@@ -13,7 +13,7 @@
       <!-- Botões de busca -->
       <button @click="searchOperadoras">Buscar</button>
       <button @click="searchAll">Buscar Todos</button>
-      <button @click="clearSearch">Limpar Busca</button> <!-- Novo botão -->
+      <button @click="clearSearch">Limpar Busca</button>
     </div>
 
     <!-- Tabela de Operadoras -->
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -62,6 +63,7 @@ export default {
         representante: "",
       },
       operadoras: [],
+      gastosAnuais: [],
       currentPage: 1,
       totalItems: 0,
     };
@@ -88,7 +90,7 @@ export default {
 
     // Busca todas as operadoras sem filtros
     async searchAll() {
-      this.clearSearch(); // Reseta os filtros antes de buscar todas
+      this.clearSearch();
       this.searchOperadoras();
     },
 
@@ -111,7 +113,8 @@ export default {
         this.currentPage = page;
         this.searchOperadoras();
       }
-    }
+    },
+
   },
 
   mounted() {

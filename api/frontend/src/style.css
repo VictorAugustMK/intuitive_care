@@ -81,7 +81,7 @@ button:focus-visible {
   }
 }
 
-.operadoras {
+.operadoras, .gastos-anuais {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,7 +112,7 @@ button:hover {
 }
 
 table {
-  width: 120%;
+  width: 100%;
   margin-top: 30px;
   border-collapse: collapse;
 }
@@ -153,11 +153,39 @@ span {
   font-size: 18px;
 }
 
-
 .search-fields input {
   padding: 10px;
   font-size: 16px;
   margin-bottom: 10px;
   width: 300px;
   margin-right: 10px;
+}
+
+.gastos-anuais {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.gastos-anuais h2 {
+  color: #ffffff;
+}
+
+.gastos-anuais table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.gastos-anuais th {
+  background-color: #535bf2;
+  color: white;
+  padding: 10px;
+}
+
+.gastos-anuais td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
