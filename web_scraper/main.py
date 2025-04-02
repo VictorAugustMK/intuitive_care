@@ -33,7 +33,7 @@ class Crawler:
             self.start_download_annex_2()
             self.accounting_year_1()
             self.accounting_year_2()
-            print("Finalizando")
+            print("Finishing")
 
         except Exception as e:
 
@@ -41,8 +41,6 @@ class Crawler:
             self.driver.quit()
 
         finally:
-
-            print("Fechando tudo")
             self.driver.quit()
 
     @staticmethod
