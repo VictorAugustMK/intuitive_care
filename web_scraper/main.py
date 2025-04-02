@@ -27,10 +27,10 @@ class Crawler:
 
             self.open_driver()
             self.accessing_url()
-            self.start_download_annex_1()
+            # self.start_download_annex_1()
             # self.start_download_annex_2()
-            # self.accounting_year_1()
-            # self.accounting_year_2()
+            self.accounting_year_1()
+            self.accounting_year_2()
             print("Finalizando")
 
         except Exception as e:
@@ -145,6 +145,8 @@ class Crawler:
                     for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
 
+                self.extract_zip(file_path, folder_path)
+
         except Exception as e:
 
             print(f"An error occurred: {e}")
@@ -189,6 +191,8 @@ class Crawler:
                 with open(file_path, "wb") as file:
                     for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
+
+                self.extract_zip(file_path, folder_path)
 
         except Exception as e:
 
@@ -349,6 +353,26 @@ class Crawler:
 
         except Exception:
             print("Cookies have already been loaded")
+
+    def extract_zip(self,zip_file, extract_to):
+
+        if not os.path.exists(zip_file):
+            raise FileNotFoundError(f"Arquivo ZIP não encontrado: {zip_file}")
+
+        os.makedirs(extract_to, exist_ok=True)
+
+        with zipfile.ZipFile(zip_file, "r") as zip_ref:
+            zip_ref.extractall(extract_to)
+
+        for file_name in os.listdir(extract_to):
+            old_path = os.path.join(extract_to, file_name)
+
+            if os.path.isfile(old_path):
+                file_base, file_ext = os.path.splitext(file_name)
+                new_name = file_base.upper() + file_ext
+                new_path = os.path.join(extract_to, new_name)
+
+                os.rename(old_path, new_path)
 
 if __name__ == "__main__":
     crawler = Crawler()
