@@ -1,44 +1,40 @@
 <template>
-  <div>
-    <h1>{{ mensagem }}</h1>
-    <p>{{ descricao }}</p>
+  <div class="home">
+    <h1>Bem-vindo à página inicial!</h1>
+    <p>Clique no botão abaixo para acessar as operadoras:</p>
+    <button @click="goToOperadoras">Ir para Operadoras</button>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
-  data() {
-    return {
-      mensagem: "Carregando mensagem...",
-      descricao: "Carregando descrição...",
-    };
-  },
-  mounted() {
-    axios
-      .get("http://127.0.0.1:5000/api/mensagem")
-      .then((response) => {
-        this.mensagem = response.data.mensagem;
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar mensagem:", error);
-      });
-
-    axios
-      .get("http://127.0.0.1:5000/api/sobre")
-      .then((response) => {
-        this.descricao = response.data.sobre;
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar sobre:", error);
-      });
-  },
+  name: 'Home',
+  methods: {
+    // Método para navegar até a tela de operadoras
+    goToOperadoras() {
+      this.$router.push('/operadoras'); // certo e operadoras
+    }
+  }
 };
 </script>
 
 <style scoped>
-h1 {
-  color: #42b983;
+.home {
+  text-align: center;
+  margin-top: 50px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #45a049;
 }
 </style>

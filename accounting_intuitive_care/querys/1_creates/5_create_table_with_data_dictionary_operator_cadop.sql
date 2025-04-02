@@ -1,12 +1,13 @@
 
 DROP TABLE IF EXISTS operator_plans.dictionary_operator_cadop;
-CREATE TABLE IF NOT exists operator_plans.dictionary_active_plans  (
+
+CREATE TABLE IF NOT exists operator_plans.dictionary_operator_cadop  (
                 field_name varchar NULL,
                 type varchar NULL,
                 size numeric NULL,
                 "desc" TEXT null);
 
-INSERT INTO operator_plans.dictionary_operator_cadop (field, type, size, desc) VALUES
+INSERT INTO operator_plans.dictionary_operator_cadop (field_name, type, size, "desc") VALUES
 ('REGISTRO_OPERADORA', 'Texto', 6, 'Registro de operadora de plano privado de assistência à saúde concedido pela ANS à pessoa jurídica para operação no setor de saúde suplementar'),
 ('CNPJ', 'Texto', 14, 'CNPJ da Operadora'),
 ('Razao_Social', 'Texto', 140, 'Razão Social da Operadora'),

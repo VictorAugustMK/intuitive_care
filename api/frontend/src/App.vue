@@ -1,34 +1,17 @@
 <template>
-  <div>
-    <button @click="executarScript">Executar Script Python</button>
-    <p v-if="output">Resultado: {{ output }}</p>
+  <div id="app">
+    <h1>Aplicação de Operadoras</h1>
+    <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/sobre">Sobre</router-link> |
+      <router-link to="/operadoras">Operadoras</router-link> <!-- Link para a página de operadoras -->
+    </nav>
+    <router-view></router-view>  <!-- Aqui as rotas serão renderizadas -->
   </div>
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
-  data() {
-    return {
-      output: null,
-    };
-  },
-  methods: {
-    executarScript() {
-      axios
-        .get("http://127.0.0.1:5000/api/download")
-        .then((response) => {
-          if (response.data.status === "Sucesso") {
-            this.output = response.data.output;
-          } else {
-            this.output = `Erro: ${response.data.output}`;
-          }
-        })
-        .catch((error) => {
-          this.output = `Erro: ${error.message}`;
-        });
-    },
-  },
+  name: 'App'
 };
 </script>
