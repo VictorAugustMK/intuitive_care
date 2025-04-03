@@ -35,43 +35,43 @@ PL/pgSQL para Stored Procedures
 🚀 Instalação e Configuração
 
 Clonando o Repositório
-
+```
 git clone https://github.com/seu-usuario/seu-repositorio.git
 cd seu-repositorio
-
+```
 Configurando o Backend
 
 Instale as dependências do Python:
-
+```bash
 pip install -r requirements.txt
-
+```
 Configure o arquivo .config com as credenciais do banco de dados e ajuste os diretórios conforme necessário.
 
 Exemplo de diretórios recomendados no .config:
-
+```
 download_dir = C:\repo\intuitive_care\web_scraper\out
 cookies_folder = C://repo//intuitive_care//web_scraper//chromedriver//cookies
 accounting_folder = C:\repo\intuitive_care\accounting_intuitive_care\financial_statements
 operator_plans_folder = C:\repo\intuitive_care\accounting_intuitive_care\operator_plans
-
+```
 Inicie a API Flask:
-
+```bash
 python app.py
-
+```
 Configurando o Frontend
 
 Navegue até a pasta do frontend:
-
+```
 cd frontend
-
+```
 Instale as dependências:
-
+```
 npm install
-
+```
 Inicie o servidor Vue.js:
-
+```
 npm run dev
-
+```
 📌 Funcionalidades
 
 📌 Página Inicial
