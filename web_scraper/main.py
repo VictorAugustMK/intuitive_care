@@ -19,6 +19,7 @@ class WebScraper:
         self.config = self.load_config()
         self.url = self.config["SELENIUM"]["url"]
         self.download_dir = self.config["SELENIUM"]["download_dir"]
+        self.driver = self.config["SELENIUM"]["path"]
         self.accounting_folder = self.config["SELENIUM"]["accounting_folder"]
         self.operator_plans_folder = self.config["SELENIUM"]["operator_plans_folder"]
         self.accounting_url = self.config["SELENIUM"]["accounting_url"]
