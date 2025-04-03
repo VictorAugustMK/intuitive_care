@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "8f5922e0-ec23-4a7a-9aae-f3b05bbdd26e",
+		"name": "Aplicação Intuitive Care",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34270412"
+	},
+	"item": [
+		{
+			"name": "WebScraper",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/download_files",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"download_files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PDF To CSV",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/pdf_csv",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"pdf_csv"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Database",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/setup_db",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"setup_db"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Operators",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/operadoras",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"operadoras"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Annual Expenses",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/gastos_anuais",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"gastos_anuais"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Quarterly Expenses",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/gastos_trimestrais",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"gastos_trimestrais"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Year Annual Expenses",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5173/gastos_trimestrais",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5173",
+					"path": [
+						"gastos_trimestrais"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
