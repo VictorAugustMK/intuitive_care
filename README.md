@@ -36,8 +36,8 @@ PL/pgSQL para Stored Procedures
 
 Clonando o Repositório
 
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/VictorAugustMK/intuitive_care.git
+cd intuitive_care
 
 Configurando o Backend
 
