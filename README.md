@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/ea39d721-9a93-437f-9f4a-27e3fb1106e0)📌 Projeto: Sistema de Consulta de Operadoras e Gastos
+📌 Projeto: Sistema de Consulta de Operadoras e Gastos
 
 📖 Visão Geral
 
