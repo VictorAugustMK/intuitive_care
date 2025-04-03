@@ -13,7 +13,7 @@ from pdf_reader.pdf_to_csv import PdfToCSV
 
 #TODO Melhor os loggins
 
-class Crawler:
+class WebScraper:
     def __init__(self):
 
         self.config = self.load_config()
@@ -347,5 +347,4 @@ class Crawler:
                 os.rename(old_path, new_path)
 
 if __name__ == "__main__":
-    crawler = Crawler()
-    pdf_to_csv = PdfToCSV()
+    web_scraper = WebScraper()
