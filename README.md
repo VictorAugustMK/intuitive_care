@@ -1,4 +1,4 @@
-📌 Projeto: Sistema de Consulta de Operadoras e Gastos
+![image](https://github.com/user-attachments/assets/ea39d721-9a93-437f-9f4a-27e3fb1106e0)📌 Projeto: Sistema de Consulta de Operadoras e Gastos
 
 📖 Visão Geral
 
@@ -36,8 +36,8 @@ PL/pgSQL para Stored Procedures
 
 Clonando o Repositório
 ```
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/VictorAugustMK/intuitive_care
+cd intuitive_care
 ```
 Configurando o Backend
 
