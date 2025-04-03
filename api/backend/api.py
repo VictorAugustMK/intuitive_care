@@ -5,7 +5,8 @@ import configparser
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from web_scraper.main import Crawler
+from web_scraper.main import WebScraper
+from pdf_reader.pdf_to_csv import PdfToCSV
 
 app = Flask(__name__)
 CORS(app)
@@ -19,7 +20,7 @@ if 'DATABASE' not in config:
 DATABASE = config['DATABASE']
 
 DATABASE_URI = f"postgresql://{DATABASE['user']}:{DATABASE['password']}@{DATABASE['host']}:{DATABASE['port']}/{DATABASE['database']}"
-print("Configuração carregada com sucesso!")
+print("Configuration loaded successfully!")
 
 
 def get_db_connection():
@@ -35,56 +36,62 @@ def get_db_connection():
 
 @app.route('/operadoras', methods=['GET'])
 def search_operator():
-    search_term = request.args.to_dict()
-    page = int(request.args.get('page', 1))
-    limit = 15
-    offset = (page - 1) * limit
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    try:
 
-    where_clauses = []
-    query_params = []
+        search_term = request.args.to_dict()
+        page = int(request.args.get('page', 1))
+        limit = 15
+        offset = (page - 1) * limit
 
-    for key, value in search_term.items():
-        if key != "page" and key != "limit" and value:
-            where_clauses.append(f"{key} ILIKE %s")
-            query_params.append(f"%{value}%")
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-    query = f"""
-    SELECT razao_social, nome_fantasia, registro_ans, cnpj, representante
-    FROM operator_plans.report_cadop
-    WHERE {where_sql}
-    LIMIT {limit} OFFSET {offset};
-    """
+        where_clauses = []
+        query_params = []
 
-    cursor.execute(query, query_params)
-    operadoras = cursor.fetchall()
+        for key, value in search_term.items():
+            if key != "page" and key != "limit" and value:
+                where_clauses.append(f"{key} ILIKE %s")
+                query_params.append(f"%{value}%")
 
-    count_query = f"""
-    SELECT COUNT(*) FROM operator_plans.report_cadop
-    WHERE {where_sql};
-    """
-    cursor.execute(count_query, query_params)
-    total_count = cursor.fetchone()[0]
-    total_pages = (total_count + limit - 1) // limit
+        where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
+        query = f"""
+        SELECT razao_social, nome_fantasia, registro_ans, cnpj, representante
+        FROM operator_plans.report_cadop
+        WHERE {where_sql}
+        LIMIT {limit} OFFSET {offset};
+        """
 
-    cursor.close()
-    conn.close()
+        cursor.execute(query, query_params)
+        operators = cursor.fetchall()
 
-    operadortors_list = []
-    for operadora in operadoras:
-        operadortors_list.append({
-            'razao_social': operadora[0],
-            'nome_fantasia': operadora[1],
-            'registro_ans': operadora[2],
-            'cnpj': operadora[3],
-            'representante': operadora[4]
-        })
+        count_query = f"""
+        SELECT COUNT(*) FROM operator_plans.report_cadop
+        WHERE {where_sql};
+        """
+        cursor.execute(count_query, query_params)
+        total_count = cursor.fetchone()[0]
+        total_pages = (total_count + limit - 1) // limit
 
-    return jsonify({'operadoras': operadortors_list, 'totalCount': total_count, 'totalPages': total_pages})
+        cursor.close()
+        conn.close()
 
+        operadortors_list = []
+        for operator in operators:
+            operadortors_list.append({
+                'razao_social': operator[0],
+                'nome_fantasia': operator[1],
+                'registro_ans': operator[2],
+                'cnpj': operator[3],
+                'representante': operator[4]
+            })
+
+        return jsonify({'operators': operadortors_list, 'totalCount': total_count, 'totalPages': total_pages})
+
+    except Exception as e:
+        print(f"Error to search operators: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/setup_db', methods=['POST'])
 def setup_db():
@@ -93,9 +100,9 @@ def setup_db():
     sql_files = glob.glob(os.path.join(querys_path, "**", "*.sql"), recursive=True)
 
     if not sql_files:
-        return jsonify({"error": "Nenhum arquivo SQL encontrado!"}), 400
+        return jsonify({"error": "No SQL file found!!"}), 400
 
-    print(f"Arquivos encontrados: {sql_files}")
+    print(f"Files found: {sql_files}")
 
     try:
         conn = get_db_connection()
@@ -111,23 +118,45 @@ def setup_db():
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "Banco de dados configurado com sucesso!"})
+        return jsonify({"message": "Database configured successfully!"})
 
     except Exception as e:
-        print(f"Erro ao configurar o banco de dados: {e}")
+        print(f"Error configuring the database: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/download_files', methods=['POST'])
 def download_files():
     try:
-        resultado = Crawler()
-        return jsonify({"message": resultado})
+        result = WebScraper()
+        if result is None:
+            return jsonify({"error": "WebScraper did not return data."}), 500
+
+        return jsonify({"message": "Finishing web scraping"})
     except Exception as e:
+        print(f"Error downloading files: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/pdf_csv', methods=['POST'])
+def transformation_to_csv():
+
+    try:
+
+        result = PdfToCSV()
+
+        if result is None:
+            return jsonify({"error": "PdfToCSV did not return data."}), 500
+
+        return jsonify({"message": "Finishing transformation"})
+
+    except Exception as e:
+        print(f"Error downloading files: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/gastos_anuais', methods=['GET'])
 def get_gastos_anuais():
+
     try:
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
@@ -143,9 +172,9 @@ def get_gastos_anuais():
             query = "SELECT * FROM financial_statements.mv_gastos_anuais LIMIT 10;"
             cursor.execute(query)
 
-        resultados = cursor.fetchall()
+        results = cursor.fetchall()
         colunas = [desc[0] for desc in cursor.description]
-        gastos_anuais = [dict(zip(colunas, linha)) for linha in resultados]
+        gastos_anuais = [dict(zip(colunas, linha)) for linha in results]
 
         cursor.close()
         conn.close()
@@ -153,25 +182,36 @@ def get_gastos_anuais():
         return jsonify({'gastos_anuais': gastos_anuais})
 
     except Exception as e:
+        print(f"Error search annual expenses: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/anos_gastos_anual', methods=['GET'])
 def get_anos_disponiveis_anual():
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    query = 'SELECT DISTINCT "ANO" FROM financial_statements.mv_gastos_anuais ORDER BY "ANO" DESC;'
-    cursor.execute(query)
-    anos = [row[0] for row in cursor.fetchall()]
+    try:
 
-    cursor.close()
-    conn.close()
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    return jsonify({"anos": anos})
+        query = 'SELECT DISTINCT "ANO" FROM financial_statements.mv_gastos_anuais ORDER BY "ANO" DESC;'
+        cursor.execute(query)
+        anos = [row[0] for row in cursor.fetchall()]
+
+        cursor.close()
+        conn.close()
+
+
+        return jsonify({"anos": anos})
+
+    except Exception as e:
+        print(f"Error search year annual expenses: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/gastos_trimestrais', methods=['GET'])
 def get_gastos_trimestrais():
+
     try:
+
         ano = request.args.get('ano')
         page = int(request.args.get('page', 1))
         limit = 15
@@ -202,7 +242,7 @@ def get_gastos_trimestrais():
         """
 
         cursor.execute(query, query_params)
-        resultados = cursor.fetchall()
+        results = cursor.fetchall()
 
         cursor.execute(count_query, query_params)
         total_count = cursor.fetchone()[0]
@@ -217,7 +257,7 @@ def get_gastos_trimestrais():
                 "ano": row[4],
                 "gastos_trimestrais": row[5]
             }
-            for row in resultados
+            for row in results
         ]
 
         cursor.close()
@@ -230,22 +270,28 @@ def get_gastos_trimestrais():
         })
 
     except Exception as e:
-        print(f"Erro ao buscar gastos trimestrais: {e}")
+        print(f"Error fetching quarterly expenses: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/anos_gastos_trimestrais', methods=['GET'])
 def get_anos_disponiveis_trimestre():
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    query = 'SELECT DISTINCT "ANO" FROM financial_statements.mv_gastos_trimestrais ORDER BY "ANO" DESC;'
-    cursor.execute(query)
-    anos = [row[0] for row in cursor.fetchall()]
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    cursor.close()
-    conn.close()
+        query = 'SELECT DISTINCT "ANO" FROM financial_statements.mv_gastos_trimestrais ORDER BY "ANO" DESC;'
+        cursor.execute(query)
+        anos = [row[0] for row in cursor.fetchall()]
 
-    return jsonify({"anos": anos})
+        cursor.close()
+        conn.close()
+
+        return jsonify({"anos": anos})
+
+    except Exception as e:
+        print(f"Error search year annual expenses: {e}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
