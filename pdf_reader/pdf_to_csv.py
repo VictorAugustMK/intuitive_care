@@ -1,4 +1,5 @@
 import configparser
+import time
 import zipfile
 import os
 import pdfplumber
@@ -14,13 +15,13 @@ class PdfToCSV:
             self.config = self.load_config()
 
             self.zip_path = self.config["CSV"]["zip_path"]
-            self.extract_folder = self.config["CSV"]["extract_folder"]
             self.out_csv = self.config["CSV"]["out_csv"]
             self.csv_name = self.config["CSV"]["csv_name"]
+            self.extension_csv = self.config["EXTENSION"]["csv"]
+            self.extension_zip = self.config["EXTENSION"]["zip"]
 
             self.find_file()
-            self.unzip_file(self.pdf_path)
-            self.export_csv(self.pdf_path, self.csv_path)
+            self.export_csv(self.pdf_path, self.out_csv)
             self.compress_file()
 
         except Exception as e:
@@ -38,60 +39,12 @@ class PdfToCSV:
         try:
 
             for file in os.listdir(self.zip_path):
-                if "anexo_I.zip" in file:
-                    file_to_unzip = file
+               if "Anexo_I_" in file:
+                    pdf_file = file
                     break
-                else:
-                    print("file not found")
 
-            file_path = self.zip_path + '\\' + file_to_unzip
-
-            with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                zip_ref.extractall(self.extract_folder)
-
-            pdf_files = [f for f in os.listdir(self.extract_folder) if f.endswith(".pdf")]
-
-            if not pdf_files:
-                print("not found pdf in zip")
-            else:
-                pdf_path = os.path.join(self.extract_folder, pdf_files[0])
-
-            self.pdf_path = pdf_path
+            self.pdf_path = self.zip_path + '\\' + pdf_file
             return self.pdf_path
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-
-    def unzip_file(self, pdf_path):
-
-        try:
-
-            for file in os.listdir(self.zip_path):
-                if "anexo_I.zip" in file:
-                    file_to_unzip = file
-                    break
-                else:
-                    print("file not found")
-
-            file_path = self.zip_path + '\\' + file_to_unzip
-
-            with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                zip_ref.extractall(self.extract_folder)
-
-            pdf_files = [f for f in os.listdir(self.extract_folder) if f.endswith(".pdf")]
-
-            if not pdf_files:
-                print("not found pdf in zip")
-            else:
-                pdf_path = os.path.join(self.extract_folder, pdf_files[0])
-
-            if os.path.isdir(self.out_csv):
-                csv_path = os.path.join(self.out_csv, self.csv_name)
-
-            self.pdf_path = pdf_path
-            self.csv_path = csv_path
-
-            return self, self.csv_path
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -117,19 +70,26 @@ class PdfToCSV:
 
                 df = pd.DataFrame(data, columns=headers)
                 df = df.rename(columns={"OD": "Seg. Odontológica", "AMB": "Seg. Ambulatorial"})
-                df.to_csv(csv_path + ".csv", index=False, encoding='utf-8', sep=';')
+
+                csv_file_path = csv_path + "\\" + self.csv_name +  self.extension_csv
+                time.sleep(10)
+                df.to_csv(csv_file_path, index=False, encoding='utf-8', sep=';')
 
         except Exception as e:
             print(f"An error occurred: {e}")
 
     def compress_file(self):
         try:
-            zip_file = os.path.join(self.out_csv, self.csv_name + ".zip")
+            # Caminho do arquivo ZIP final dentro da pasta `out_csv`
+            zip_file = os.path.join(self.out_csv, self.csv_name + self.extension_zip)
+
             with zipfile.ZipFile(zip_file, "w") as zipf:
                 for file_name in os.listdir(self.out_csv):
                     file_path = os.path.join(self.out_csv, file_name)
-                    if os.path.isfile(file_path) and not file_name.endswith(".zip"):
+
+                    if os.path.isfile(file_path) and file_name.endswith(".csv"):
                         zipf.write(file_path, os.path.basename(file_path))
+
         except Exception as e:
             print(f"An error occurred: {e}")
 
